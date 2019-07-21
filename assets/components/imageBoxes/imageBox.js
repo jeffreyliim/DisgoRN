@@ -1,10 +1,11 @@
-import {Image, StyleSheet, View} from "react-native";
+import { StyleSheet, View} from "react-native";
+import {Image} from 'react-native-elements'
 import React from "react";
 
-export const ImageBox = ({source}) => {
+export const ImageBox = ({source}, props) => {
     return (
         <View style={styles.shadowImage}>
-            <Image style={styles.image} source={source}/>
+            <Image style={styles.image} source={source} {...props}/>
         </View>
     )
 }

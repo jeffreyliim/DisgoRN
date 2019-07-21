@@ -8,9 +8,12 @@ import {FontStyles} from "../../styles/fontStyles";
 import {ButtonV1} from "../../assets/components/buttons/buttonV1";
 import {Icon} from "react-native-elements";
 import {ImageBox} from "../../assets/components/imageBoxes/imageBox";
+import ImagePicker from 'react-native-image-picker';
+import {autobind} from "core-decorators";
 
 const {fontScale, height, width} = Dimensions.get('window')
 
+@autobind
 export class ChallengeDetails extends React.Component {
 
     static navigationOptions = ({navigation}) => {
@@ -25,7 +28,10 @@ export class ChallengeDetails extends React.Component {
 
     constructor(props) {
         super(props);
-
+        this.state = {
+            avatarSource: null,
+            isProcessing: false,
+        }
     }
 
 
@@ -44,12 +50,46 @@ export class ChallengeDetails extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         // only update chart if the data has changed
-        // if (prevProps.data !== this.props.data) {
-        //   this.chart = c3.load({
-        //    data: this.props.data
-        //    });
-        //  }
+        if (prevState.isProcessing !== this.state.isProcessing && this.state.isProcessing === true) {
+            this.setState({isProcessing: false,})
+            return this.props.navigation.navigate('ImageProcessing')
+        }
     }
+
+    selectPhotoTapped() {
+        const options = {
+            quality: 1.0,
+            maxWidth: 500,
+            maxHeight: 500,
+            storageOptions: {
+                skipBackup: true,
+            },
+        };
+
+        ImagePicker.launchCamera(options, response => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled photo picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+                let source = {uri: response.uri};
+
+                // You can also display the image using data:
+                // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    avatarSource: source,
+                });
+
+                this.props.navigation.navigate('ImageProcessing')
+            }
+        });
+    }
+
 
     render() {
 
@@ -87,7 +127,8 @@ export class ChallengeDetails extends React.Component {
                     </Row>
                     <Row size={20}>
                         <Col style={{justifyContent: 'center'}}>
-                            <ButtonV1 title={'Take a photo'}/>
+                            <ButtonV1 title={'addd'} onPress={() => this.setState({isProcessing: true})}/>
+                            <ButtonV1 title={'Take a photo'} onPress={this.selectPhotoTapped}/>
                         </Col>
                     </Row>
                 </Grid>
