@@ -1,8 +1,13 @@
 import React from "react"
-import {Dimensions, StatusBar, StyleSheet, View} from "react-native"
-import {SafeAreaView} from 'react-navigation'
+import {Dimensions, StyleSheet, Text} from "react-native"
 import {NavbarStyles} from "../../styles/navbarStyles";
 import {DefaultBackButton} from "../../assets/components/buttons/defaultBackButton";
+import {DefaultContainer} from "../../assets/components/containers/defaultContainer";
+import {Col, Grid, Row} from "react-native-easy-grid";
+import {FontStyles} from "../../styles/fontStyles";
+import {ButtonV1} from "../../assets/components/buttons/buttonV1";
+import {Icon} from "react-native-elements";
+import {ImageBox} from "../../assets/components/imageBoxes/imageBox";
 
 const {fontScale, height, width} = Dimensions.get('window')
 
@@ -49,25 +54,48 @@ export class ChallengeDetails extends React.Component {
     render() {
 
         return (
-            <SafeAreaView style={styles.SafeArea}>
-                <StatusBar barStyle={'dark-content'}/>
-                <View style={styles.Main}>
-
-                </View>
-            </SafeAreaView>
+            <DefaultContainer>
+                <Grid>
+                    <Row size={3}/>
+                    <Row size={35}>
+                        <ImageBox source={require('../../assets/images/durian.jpg')}/>
+                    </Row>
+                    <Row size={32}>
+                        <Col>
+                            <Row size={40} style={{justifyContent: 'center', alignItems: 'center'}}>
+                                <Text style={FontStyles.bold}>You need to find this object and take a photo for
+                                    us!</Text>
+                            </Row>
+                            <Row size={10}>
+                                <Icon type={'simple-line-icon'} size={15} name={'location-pin'}/>
+                                <Col>
+                                    <Text style={[FontStyles.smallBold, {marginLeft: 8}]}>Henderson Road 221, Singapore
+                                        159557</Text>
+                                </Col>
+                            </Row>
+                            <Row size={5}/>
+                            <Row size={45}>
+                                <Col style={{justifyContent: 'space-around'}}>
+                                    <Text style={FontStyles.regular}>Make sure:</Text>
+                                    <Text style={FontStyles.small}>• You have adequate lighting</Text>
+                                    <Text style={FontStyles.small}>• Entire item has to be in the photo</Text>
+                                    <Text style={FontStyles.small}>• You will have unlimited tries to take the
+                                        photo</Text>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                    <Row size={20}>
+                        <Col style={{justifyContent: 'center'}}>
+                            <ButtonV1 title={'Take a photo'}/>
+                        </Col>
+                    </Row>
+                </Grid>
+            </DefaultContainer>
         )
     }
 }
 
-export const colors = {
-    'black': '#353B50',
-    'white': '#FFFFFF',
-    'grey': '#DDDDDD',
-    'grey2': 'gray',
-    'background': '#FEFEFF',
-    'red': '#ED4C67',
-    'green': '#1abc9c'
-}
 const styles = StyleSheet.create({
     SafeArea: {
         flex: 1,
@@ -75,16 +103,5 @@ const styles = StyleSheet.create({
     },
     Main: {
         flex: 1,
-    },
-    defaultHeaderStyle: {
-        borderBottomWidth: 0,
-        shadowOffset: {height: 0.5,},
-        shadowColor: colors.grey,
-        shadowOpacity: 0.9,
-    },
-    defaultHeaderTitleStyle: {
-        color: colors.black,
-        fontSize: 16.00,
-        fontWeight: '700',
     },
 })

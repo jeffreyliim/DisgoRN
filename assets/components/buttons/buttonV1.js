@@ -16,7 +16,7 @@ export const ButtonV1 = (props) => {
                     paddingLeft: 3, paddingRight: 3,
                     ...buttonStyle
                 }}
-                activeOpacity={0.90}
+                activeOpacity={0.80}
                 buttonStyle={{
                     height: 55,
                     // width: '100%',

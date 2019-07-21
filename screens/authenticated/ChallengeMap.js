@@ -8,11 +8,13 @@ import {MapMarker} from "../../assets/components/mapMarkers/mapMarker";
 import Animatable from "../../assets/animations/customAnimations";
 import {autobind} from "core-decorators";
 import Modal from "react-native-modal";
-import {Button, Text} from "react-native-elements";
+import {Image, Text} from "react-native-elements";
 import {DefaultCancelButton} from "../../assets/components/buttons/defaultCancelButton";
 import LottieView from 'lottie-react-native';
-import {Grid, Row} from "react-native-easy-grid";
+import {Col, Grid, Row} from "react-native-easy-grid";
 import {FontStyles} from "../../styles/fontStyles";
+import {ContainerWithoutSafeAreaView} from "../../assets/components/containers/containerWithoutSafeAreaView";
+import {ButtonV1} from "../../assets/components/buttons/buttonV1";
 
 const {fontScale, height, width} = Dimensions.get('window')
 const ASPECT_RATIO = width / height;
@@ -48,7 +50,7 @@ export class ChallengeMap extends React.Component {
                     completed: false,
                 }
             ],
-            selectedChallengeIndex: 0
+            selectedChallengeIndex: 0,
         }
     }
 
@@ -135,12 +137,11 @@ export class ChallengeMap extends React.Component {
 
     renderPreviewModal(challenges) {
         return (
-            <Modal animationIn={'bounceIn'} animationOut={'bounceOut'} isVisible={this.state.isModalVisible} onBackdropPress={this.closeModal}>
-                <View style={{borderRadius: 15, flex: 0.7, backgroundColor: "white"}}>
+            <Modal animationIn={'bounceIn'} animationOut={'bounceOut'} isVisible={this.state.isModalVisible}
+                   onBackdropPress={this.closeModal}>
+                <View style={{borderRadius: 15, flex: 0.6, backgroundColor: "white"}}>
                     <DefaultCancelButton navigation={null} onPress={this.closeModal}/>
-                    <SafeAreaView style={{flex: 1}} forceInset={{top: "always"}}>
-                        {this.RenderModalContent(challenges[this.state.selectedChallengeIndex])}
-                    </SafeAreaView>
+                    {this.RenderModalContent(challenges[this.state.selectedChallengeIndex])}
                 </View>
             </Modal>
         )
@@ -148,29 +149,69 @@ export class ChallengeMap extends React.Component {
 
     renderCompletedModal(challenge) {
         return (
-            <Grid>
-                <Row size={10}>
-                </Row>
-                <Row size={55}>
-                    <LottieView source={require('./../../assets/animations/1798-check-animation.json')} autoPlay
-                                loop/>
-                </Row>
-                <Row size={35}>
-                    <Text style={[FontStyles.h1, {textAlign: 'center', marginLeft: 40, marginRight: 40}]}>You've
-                        already completed this
-                        challenge</Text>
-                </Row>
-            </Grid>
+            <ContainerWithoutSafeAreaView>
+                <Grid>
+                    <Row size={10}>
+                    </Row>
+                    <Row size={55}>
+                        <LottieView source={require('./../../assets/animations/1798-check-animation.json')} autoPlay
+                                    loop={false}/>
+                    </Row>
+                    <Row size={35}>
+                        <Text style={[FontStyles.h1, {textAlign: 'center', marginLeft: 20, marginRight: 20}]}>You've
+                            already completed this
+                            challenge</Text>
+                    </Row>
+                </Grid>
+            </ContainerWithoutSafeAreaView>
         )
     }
 
     renderChallengeModal(challenge) {
         return (
             <React.Fragment>
-                <Text>{challenge.longitude}</Text>
-                <Button title="Hide modal"/>
+                <Grid>
+                    <Row size={45}>
+                        <View style={styles.Main}>
+                            <Image style={styles.modalImage} source={require('./../../assets/images/durian.jpg')}/>
+                        </View>
+                    </Row>
+                    <Row size={55}>
+                        <ContainerWithoutSafeAreaView>
+                            <Row size={60}>
+                                <Col>
+                                    <View style={{flex: 1, justifyContent: 'space-around'}}>
+                                        <Text style={FontStyles.h1}>Here's your challenge</Text>
+                                        <Text style={FontStyles.regular}>Restaurant ABC</Text>
+                                        <Text style={FontStyles.small}>Find out how to win a 20% discount off your next
+                                            CirclesLife bill.</Text>
+                                    </View>
+                                </Col>
+                            </Row>
+                            <Row size={40}>
+                                <Col>
+                                    <ButtonV1 title={'Try this challenge'}
+                                              onPress={() => this.onTryChallengePressed(challenge)}/>
+                                </Col>
+                            </Row>
+                        </ContainerWithoutSafeAreaView>
+                    </Row>
+                </Grid>
             </React.Fragment>
         )
+    }
+
+    onTryChallengePressed(challenge) {
+        this.setState({
+            isModalVisible: false,
+        }, () => {
+            setTimeout(() => {
+                return this.props.navigation.navigate('ChallengeDetails', {
+                    challenge
+                })
+            }, 200)
+        })
+
     }
 }
 
@@ -182,4 +223,8 @@ const styles = StyleSheet.create({
     Main: {
         flex: 1,
     },
+    modalImage: {
+        width: '100%',
+        height: '100%'
+    }
 })

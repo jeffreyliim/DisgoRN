@@ -1,14 +1,14 @@
-import React, {Component} from "react"
-import {Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import React from "react"
+import {Dimensions, Platform, StyleSheet, Text, View} from "react-native"
 import {NavbarStyles} from "../../styles/navbarStyles";
-import Carousel, {Pagination, ParallaxImage} from "react-native-snap-carousel";
-import PropTypes from 'prop-types'
 import {colors} from "../../styles/colors";
 import {FontStyles} from "../../styles/fontStyles";
 import {Grid, Row} from "react-native-easy-grid";
 import {DefaultContainer} from "../../assets/components/containers/defaultContainer";
 import {ButtonV1} from "../../assets/components/buttons/buttonV1";
 import {autobind} from "core-decorators";
+import {HeaderRight} from "../../assets/components/buttons/headerRight";
+import {ImageCarousel} from "../../assets/components/imageCarousel/ImageCarousel";
 
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
 const entryBorderRadius = 8;
@@ -27,117 +27,6 @@ export const sliderWidth = viewportWidth;
 export const itemWidth = slideWidth + itemHorizontalMargin * 2;
 
 @autobind
-class SliderEntry extends Component {
-
-    static propTypes = {
-        data: PropTypes.object.isRequired,
-        even: PropTypes.bool,
-        parallax: PropTypes.bool,
-        parallaxProps: PropTypes.object
-    };
-
-    get image() {
-        const {data: {illustration}, parallax, parallaxProps, even} = this.props;
-
-        return parallax ? (
-            <ParallaxImage
-                source={{uri: illustration}}
-                containerStyle={[styles.imageContainer, even ? styles.imageContainerEven : {}]}
-                style={styles.image}
-                parallaxFactor={0.35}
-                showSpinner={true}
-                spinnerColor={even ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'}
-                {...parallaxProps}
-            />
-        ) : (
-            <Image
-                source={{uri: illustration}}
-                style={styles.image}
-            />
-        );
-    }
-
-    render() {
-        const {data: {id, title, subtitle}, even} = this.props;
-
-        const uppercaseTitle = title ? (
-            <Text
-                style={[styles.title, even ? styles.titleEven : {}]}
-                numberOfLines={2}
-            >
-                {title.toUpperCase()}
-            </Text>
-        ) : false;
-
-        return (
-            <TouchableOpacity
-                activeOpacity={1}
-                style={styles.slideInnerContainer}
-                onPress={this.onCardPressed}
-            >
-                <View style={styles.shadow}/>
-                <View style={[styles.imageContainer, even ? styles.imageContainerEven : {}]}>
-                    {this.image}
-                    <View style={[styles.radiusMask, even ? styles.radiusMaskEven : {}]}/>
-                </View>
-                <View style={[styles.textContainer, even ? styles.textContainerEven : {}]}>
-                    {uppercaseTitle}
-                    <Text
-                        style={[styles.subtitle, even ? styles.subtitleEven : {}]}
-                        numberOfLines={2}
-                    >
-                        {subtitle}
-                    </Text>
-                </View>
-            </TouchableOpacity>
-        );
-    }
-
-    onCardPressed() {
-        return this.props.navigation.navigate('ChallengeMap')
-    }
-}
-
-export const ENTRIES1 = [
-    {
-        id: 1,
-        title: 'Beautiful and dramatic Antelope Canyon',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
-        illustration: 'https://i.imgur.com/UYiroysl.jpg'
-    },
-    {
-        id: 2,
-        title: 'Earlier this morning, NYC',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/UPrs1EWl.jpg'
-    },
-    {
-        id: 3,
-        title: 'White Pocket Sunset',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat ',
-        illustration: 'https://i.imgur.com/MABUbpDl.jpg'
-    },
-    {
-        id: 4,
-        title: 'Acrocorinth, Greece',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
-        illustration: 'https://i.imgur.com/KZsmUi2l.jpg'
-    },
-    {
-        id: 5,
-        title: 'The lone tree, majestic landscape of New Zealand',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/2nCt3Sbl.jpg'
-    },
-    {
-        id: 6,
-        title: 'Middle Earth, Germany',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/lceHsT6l.jpg'
-    }
-];
-
-@autobind
 export class SelectChallenge extends React.Component {
 
     static navigationOptions = ({navigation}) => {
@@ -145,7 +34,10 @@ export class SelectChallenge extends React.Component {
         return {
             title: "Select Challenge",
             headerStyle: NavbarStyles.defaultHeaderStyle,
-            headerTitleStyle: NavbarStyles.defaultHeaderTitleStyle
+            headerTitleStyle: NavbarStyles.defaultHeaderTitleStyle,
+            headerRight: <HeaderRight onPress={params.onMileStonesPressed ? params.onMileStonesPressed : null}>
+                <Text style={FontStyles.small}>My Milestones</Text>
+            </HeaderRight>
         }
     }
 
@@ -154,8 +46,14 @@ export class SelectChallenge extends React.Component {
         this.state = {
             slider1ActiveSlide: 1
         };
+        props.navigation.setParams({
+            onMileStonesPressed: this.onMileStonesPressed
+        })
     }
 
+    onMileStonesPressed() {
+        this.props.navigation.navigate('Milestones')
+    }
 
     componentDidMount() {
 
@@ -192,8 +90,6 @@ export class SelectChallenge extends React.Component {
     }
 
     render() {
-        const {slider1ActiveSlide} = this.state;
-
         return (
             <Grid>
                 <Row size={15}>
@@ -206,38 +102,11 @@ export class SelectChallenge extends React.Component {
                 </Row>
                 <Row size={45}>
                     <View style={{flex: 1}}>
-                        <Carousel
-                            ref={c => this._slider1Ref = c}
-                            data={ENTRIES1}
-                            renderItem={this._renderItemWithParallax}
-                            sliderWidth={sliderWidth}
-                            itemWidth={itemWidth}
-                            hasParallaxImages={true}
-                            firstItem={1}
-                            inactiveSlideScale={0.94}
-                            inactiveSlideOpacity={0.6}
-                            // inactiveSlideShift={20}
-                            containerCustomStyle={styles.slider}
-                            contentContainerCustomStyle={styles.sliderContentContainer}
-                            loop={true}
-                            loopClonesPerSide={2}
-                            autoplay={true}
-                            autoplayDelay={500}
-                            autoplayInterval={3000}
-                            onSnapToItem={(index) => this.setState({slider1ActiveSlide: index})}
-                        />
-                        <Pagination
-                            dotsLength={ENTRIES1.length}
-                            activeDotIndex={slider1ActiveSlide}
-                            containerStyle={styles.paginationContainer}
-                            dotColor={colors.black}
-                            dotStyle={styles.paginationDot}
-                            inactiveDotColor={colors.black}
-                            inactiveDotOpacity={0.4}
-                            inactiveDotScale={0.6}
-                            carouselRef={this._slider1Ref}
-                            tappableDots={!!this._slider1Ref}
-                        />
+                        <ImageCarousel navigation={this.props.navigation} onSliderEntryPressed={() => {
+                            return this.props.navigation.navigate('ChallengeMap'
+                            // ,{campaignID}
+                                )
+                        }}/>
                     </View>
                 </Row>
                 <Row size={40}>
@@ -271,18 +140,19 @@ const styles = StyleSheet.create({
         left: itemHorizontalMargin,
         right: itemHorizontalMargin,
         bottom: 18,
-        shadowColor: colors.black,
+        shadowColor: '#000',
         shadowOpacity: 0.25,
-        shadowOffset: {width: 0, height: 10},
+        shadowOffset: {width: 0, height: 8},
         shadowRadius: 10,
-        borderRadius: entryBorderRadius
+        borderRadius: entryBorderRadius,
+        elevation: 5,
     },
     imageContainer: {
         flex: 1,
         marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
         backgroundColor: 'white',
         borderTopLeftRadius: entryBorderRadius,
-        borderTopRightRadius: entryBorderRadius
+        borderTopRightRadius: entryBorderRadius,
     },
     imageContainerEven: {
         backgroundColor: colors.black
