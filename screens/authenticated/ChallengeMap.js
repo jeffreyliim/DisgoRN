@@ -160,7 +160,7 @@ export class ChallengeMap extends React.Component {
                     <Row size={35}>
                         <Text style={[FontStyles.h1, {textAlign: 'center', marginLeft: 20, marginRight: 20}]}>You've
                             already completed this
-                            challenge</Text>
+                            event</Text>
                     </Row>
                 </Grid>
             </ContainerWithoutSafeAreaView>
@@ -181,7 +181,7 @@ export class ChallengeMap extends React.Component {
                             <Row size={60}>
                                 <Col>
                                     <View style={{flex: 1, justifyContent: 'space-around'}}>
-                                        <Text style={FontStyles.h1}>Here's your challenge</Text>
+                                        <Text style={FontStyles.h1}>Here's your event</Text>
                                         <Text style={FontStyles.regular}>Restaurant ABC</Text>
                                         <Text style={FontStyles.small}>Find out how to win a 20% discount off your next
                                             CirclesLife bill.</Text>
@@ -206,7 +206,7 @@ export class ChallengeMap extends React.Component {
             isModalVisible: false,
         }, () => {
             setTimeout(() => {
-                return this.props.navigation.navigate('ChallengeDetails', {
+                return this.props.navigation.navigate('EventDetails', {
                     challenge
                 })
             }, 200)

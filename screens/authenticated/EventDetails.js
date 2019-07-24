@@ -14,12 +14,12 @@ import {autobind} from "core-decorators";
 const {fontScale, height, width} = Dimensions.get('window')
 
 @autobind
-export class ChallengeDetails extends React.Component {
+export class EventDetails extends React.Component {
 
     static navigationOptions = ({navigation}) => {
         const {params = {}} = navigation.state
         return {
-            title: "Your Challenge Details",
+            title: "Your Event Details",
             headerStyle: NavbarStyles.defaultHeaderStyle,
             headerTitleStyle: NavbarStyles.defaultHeaderTitleStyle,
             headerLeft: <DefaultBackButton navigation={navigation}/>
@@ -36,7 +36,6 @@ export class ChallengeDetails extends React.Component {
 
 
     componentDidMount() {
-
         // Additional component initialization can go here.
         // If you need to load data from a remote endpoint, this is a good place to instantiate the network request.
     }
@@ -67,7 +66,7 @@ export class ChallengeDetails extends React.Component {
         };
 
         ImagePicker.launchCamera(options, response => {
-            console.log('Response = ', response);
+            // console.log('Response = ', response);
 
             if (response.didCancel) {
                 console.log('User cancelled photo picker');
@@ -77,7 +76,6 @@ export class ChallengeDetails extends React.Component {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
                 let source = {uri: response.uri};
-
                 // You can also display the image using data:
                 // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
@@ -85,7 +83,10 @@ export class ChallengeDetails extends React.Component {
                     avatarSource: source,
                 });
 
-                this.props.navigation.navigate('ImageProcessing')
+                console.log(response)
+                this.props.navigation.navigate('ImageProcessing', {
+                    imageResponse: response,
+                })
             }
         });
     }
@@ -127,13 +128,28 @@ export class ChallengeDetails extends React.Component {
                     </Row>
                     <Row size={20}>
                         <Col style={{justifyContent: 'center'}}>
-                            <ButtonV1 title={'addd'} onPress={() => this.setState({isProcessing: true})}/>
+                            <ButtonV1 title={"Fire test mocky api"} onPress={this.onGetMocky}/>
                             <ButtonV1 title={'Take a photo'} onPress={this.selectPhotoTapped}/>
                         </Col>
                     </Row>
                 </Grid>
             </DefaultContainer>
         )
+    }
+
+    onGetMocky() {
+        return new Promise(async (resolve, reject) => {
+            await fetch("http://www.mocky.io/v2/5185415ba171ea3a00704eed", {
+                method: "GET"
+            }).then(res => {
+                res.json().then(data => {
+                    console.log(data)
+                })
+                resolve()
+            }).catch(err => {
+                console.log(err)
+            })
+        })
     }
 }
 

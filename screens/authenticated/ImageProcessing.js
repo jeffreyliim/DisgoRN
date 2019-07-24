@@ -10,6 +10,8 @@ import {Text, View,} from "react-native-animatable";
 import {Col, Row} from "react-native-easy-grid";
 import {ButtonV2} from "../../assets/components/buttons/buttonV2";
 import Animatable from './../../assets/animations/customAnimations'
+import RNFS from "react-native-fs";
+import {API_URL} from "../../config/config";
 
 const {fontScale, height, width} = Dimensions.get('window')
 
@@ -28,14 +30,18 @@ export class ImageProcessing extends React.Component {
         this.state = {
             showSuccessAlert: false,
             showFailAlert: false,
+            imageResponse: props.navigation.getParam('imageResponse')
         }
     }
 
 
     componentDidMount() {
+        this.handleUploadPhoto()
+        // console.log(this.state.imageResponse)
         setTimeout(() => {
             this.setState({showFailAlert: true,})
         }, 3000)
+        // console.log(this.state.imageResponse)
         // Additional component initialization can go here.
         // If you need to load data from a remote endpoint, this is a good place to instantiate the network request.
     }
@@ -65,6 +71,51 @@ export class ImageProcessing extends React.Component {
         }
     }
 
+    createFormData = (photo, body) => {
+        const data = new FormData();
+        data.append('photo', {
+            uri: photo.uri,
+            name: `${photo.fileSize}_${Math.random().toString(10)}.jpeg`,
+            type: photo.type,
+        });
+
+        return data;
+    };
+
+    handleUploadPhoto = async () => {
+        await fetch(`${API_URL}/uploader`, {
+            method: "POST",
+            body: this.createFormData(this.state.imageResponse, null)
+        }).then(response => {
+            alert("Upload success!");
+            response.json().then(data => {
+                console.log(data)
+                this.setState({imageResponse: null});
+            })
+        }).catch(error => {
+            console.log("upload error", error);
+            alert("Upload failed!");
+        });
+    }
+
+    handleUploadPhotoFailedResponse() {
+        this.setState({
+            showFailAlert: true,
+        }, () => {
+            // delete image
+            RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
+        })
+    }
+
+    handleUploadPhotoSuccessResponse() {
+        this.setState({
+            showSuccessAlert: true,
+        }, () => {
+            // delete image
+            RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
+        })
+    }
+
     renderImageComparison() {
         return (
             <View style={{flex: 1}}>
@@ -73,7 +124,7 @@ export class ImageProcessing extends React.Component {
                         <ImageBox source={require('./../../assets/images/durian.jpg')}/>
                     </Col>
                     <Col>
-                        <ImageBox source={require('./../../assets/images/durian.jpg')}/>
+                        <ImageBox source={{uri: this.state.imageResponse.uri}}/>
                     </Col>
                 </Row>
             </View>
@@ -81,7 +132,7 @@ export class ImageProcessing extends React.Component {
     }
 
     render() {
-        const {showSuccessAlert, showFailAlert} = this.state
+        const {showSuccessAlert, showFailAlert, imageResponse} = this.state
 
         return (
             <DefaultContainer backgroundColor={'#0099FF'}>
@@ -117,27 +168,33 @@ export class ImageProcessing extends React.Component {
                     <Row size={30}>
                         {showFailAlert ?
                             <Col style={[styles.Main, {alignItems: 'stretch'}]}>
-                                <ButtonV2 title={'Try again'} onPress={() => {
-                                    // temporary here only, pls remove when integrating
-                                    this.setState({
-                                        showSuccessAlert: true
-                                    })
-                                    // return this.props.navigation.navigate('ChallengeDetails')
-                                }}/>
+                                <ButtonV2 title={'Try again'} onPress={this.onTryAgainPressed}/>
                             </Col>
                             : showSuccessAlert ? <Col style={[styles.Main, {alignItems: 'stretch'}]}>
-                                <ButtonV2 title={'See your results'} onPress={() => {
-                                    // this.setState({
-                                    //     showSuccessAlert: false,
-                                    //     showFailAlert: false,
-                                    // })
-                                    return this.props.navigation.navigate('ChallengeResults')
-                                }}/>
+                                <ButtonV2 title={'See your results'} onPress={this.onSeeYourResults}/>
                             </Col> : null}
                     </Row>
                 </Animatable.View>
             </DefaultContainer>
         )
+    }
+
+    onTryAgainPressed() {
+        RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
+
+        // temporary here only, pls remove when integrating
+        this.setState({
+            showSuccessAlert: true
+        })
+        // return this.props.navigation.navigate('EventDetails')
+    }
+
+    onSeeYourResults() {
+        this.setState({
+            showSuccessAlert: false,
+            showFailAlert: false,
+        })
+        return this.props.navigation.navigate('EventResults')
     }
 }
 

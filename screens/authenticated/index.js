@@ -1,18 +1,18 @@
 import {createStackNavigator} from 'react-navigation'
 import {SelectChallenge} from "./SelectChallenge";
 import {ChallengeMap} from "./ChallengeMap";
-import {ChallengeDetails} from "./ChallengeDetails";
+import {EventDetails} from "./EventDetails";
 import {Milestones} from "./Milestones";
 import {ImageProcessing} from "./ImageProcessing";
-import {ChallengeResults} from "./ChallengeResults";
+import {EventResults} from "./EventResults";
 
 export default createStackNavigator({
     SelectChallenge,
     ChallengeMap,
-    ChallengeDetails,
+    EventDetails,
     Milestones,
     ImageProcessing,
-    ChallengeResults,
+    EventResults,
 }, {
     initialRouteName: "SelectChallenge"
 })

@@ -8,7 +8,7 @@ import {autobind} from "core-decorators";
 const {fontScale, height, width} = Dimensions.get('window')
 
 @autobind
-export class ChallengeResults extends React.Component {
+export class EventResults extends React.Component {
 
     static navigationOptions = ({navigation}) => {
         const {params = {}} = navigation.state
@@ -49,7 +49,7 @@ export class ChallengeResults extends React.Component {
     }
 
     render() {
-
+    // dk if we're actually doing this
         return (
             <DefaultContainer>
                 <ButtonV1 title={'Home'} onPress={this.onSelectChallengePressed}/>

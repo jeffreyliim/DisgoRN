@@ -3,7 +3,7 @@ import {API_URL} from "../config/config";
 
 export class Store {
     async get(URL, body) {
-        const appURL = API_URL + 'api/' + URL
+        const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
             await fetch(fetchURL, {
@@ -21,7 +21,7 @@ export class Store {
     }
 
     async delete(URL, body) {
-        const appURL = API_URL + 'api/' + URL
+        const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
             return await fetch(appURL, {
@@ -40,7 +40,7 @@ export class Store {
     }
 
     async post(URL, body) {
-        const appURL = API_URL + 'api/' + URL
+        const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
             await fetch(appURL, {
@@ -58,7 +58,7 @@ export class Store {
     }
 
     async put(URL, body) {
-        const appURL = API_URL + 'api/' + URL
+        const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
             await fetch(appURL, {
