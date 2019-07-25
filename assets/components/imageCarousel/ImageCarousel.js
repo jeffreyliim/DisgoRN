@@ -21,40 +21,16 @@ export const itemWidth = slideWidth + itemHorizontalMargin * 2;
 export const ENTRIES1 = [
     {
         id: 1,
-        title: 'Beautiful and dramatic Antelope Canyon',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
-        illustration: 'https://i.imgur.com/UYiroysl.jpg'
+        title: '',
+        subtitle: '',
+        illustration: 'https://i.ibb.co/84b1XHQ/sg-food.jpg'
     },
     {
         id: 2,
-        title: 'Earlier this morning, NYC',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/UPrs1EWl.jpg'
+        title: '',
+        subtitle: '',
+        illustration: 'https://i.ibb.co/B3jRryC/merlion.jpg",'
     },
-    {
-        id: 3,
-        title: 'White Pocket Sunset',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat ',
-        illustration: 'https://i.imgur.com/MABUbpDl.jpg'
-    },
-    {
-        id: 4,
-        title: 'Acrocorinth, Greece',
-        subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
-        illustration: 'https://i.imgur.com/KZsmUi2l.jpg'
-    },
-    {
-        id: 5,
-        title: 'The lone tree, majestic landscape of New Zealand',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/2nCt3Sbl.jpg'
-    },
-    {
-        id: 6,
-        title: 'Middle Earth, Germany',
-        subtitle: 'Lorem ipsum dolor sit amet',
-        illustration: 'https://i.imgur.com/lceHsT6l.jpg'
-    }
 ];
 
 @autobind
@@ -63,6 +39,17 @@ export class ImageCarousel extends React.Component {
         super(props)
         this.state = {
             slider1ActiveSlide: 1,
+            campaigns: null,
+        }
+    }
+
+    componentDidMount() {
+
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.campaigns !== this.props.campaigns) {
+            this.formatCampaignData(this.props.campaigns)
         }
     }
 
@@ -70,7 +57,7 @@ export class ImageCarousel extends React.Component {
         return (
             <SliderEntry
                 navigation={this.props.navigation}
-                onSliderEntryPressed={this.props.onSliderEntryPressed}
+                onSliderEntryPressed={() => this.props.onSliderEntryPressed(item)}
                 data={item}
                 even={(index + 1) % 2 === 0}
                 parallax={true}
@@ -80,12 +67,12 @@ export class ImageCarousel extends React.Component {
     }
 
     render() {
-        const {slider1ActiveSlide} = this.state
+        const {slider1ActiveSlide, campaigns} = this.state
         return (
             <React.Fragment>
                 <Carousel
                     ref={c => this._slider1Ref = c}
-                    data={ENTRIES1}
+                    data={campaigns ? campaigns : ENTRIES1}
                     renderItem={this._renderItemWithParallax}
                     sliderWidth={sliderWidth}
                     itemWidth={itemWidth}
@@ -105,7 +92,7 @@ export class ImageCarousel extends React.Component {
                     onSnapToItem={(index) => this.setState({slider1ActiveSlide: index})}
                 />
                 <Pagination
-                    dotsLength={ENTRIES1.length}
+                    dotsLength={campaigns ? campaigns.length : ENTRIES1.length}
                     activeDotIndex={slider1ActiveSlide}
                     containerStyle={styles.paginationContainer}
                     dotColor={colors.black}
@@ -118,6 +105,24 @@ export class ImageCarousel extends React.Component {
                 />
             </React.Fragment>
         )
+    }
+
+    formatCampaignData(campaigns) {
+        if (campaigns !== undefined) {
+            let formattedCampaigns = []
+            campaigns.response.map(c => {
+                let obj = {
+                    id: c.id,
+                    title: c.name,
+                    subtitle: c.description,
+                    illustration: c.image_url
+                }
+                formattedCampaigns.push(obj)
+            })
+            this.setState({
+                campaigns: formattedCampaigns
+            })
+        }
     }
 }
 

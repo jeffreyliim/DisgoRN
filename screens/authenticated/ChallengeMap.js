@@ -36,27 +36,15 @@ export class ChallengeMap extends React.Component {
         super(props);
         this.state = {
             isModalVisible: false,
-            challenges: [
-                {
-                    id: 1,
-                    latitude: 1.328482,
-                    longitude: 103.804085,
-                    completed: true,
-                },
-                {
-                    id: 2,
-                    latitude: 1.3004,
-                    longitude: 103.8384,
-                    completed: false,
-                }
-            ],
+            campaign: props.navigation.getParam('campaign'),
+            events: [],
             selectedChallengeIndex: 0,
         }
     }
 
 
     componentDidMount() {
-
+        this.fetchEvents()
         // Additional component initialization can go here.
         // If you need to load data from a remote endpoint, this is a good place to instantiate the network request.
     }
@@ -86,27 +74,31 @@ export class ChallengeMap extends React.Component {
     }
 
     renderMapsView() {
-        const {challenges} = this.state
-        const LATITUDE_DELTA = (challenges[0].latitude / challenges[0].longitude) * 30
+        const {events} = this.state
+        if (events.length < 1) {
+            return null
+        }
+        const LATITUDE_DELTA = (events[0].location[0] / events[0].location[1]) * 30
         const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
         return (
             <MapView initialRegion={{
-                latitude: challenges[0].latitude,
-                longitude: challenges[0].longitude,
+                latitude: events[0].location[0],
+                longitude: events[0].location[1],
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA,
             }}
                      showsPointsOfInterest={true}
                      style={StyleSheet.absoluteFill}>
-                {challenges.map((coordinate, index) => {
+                {events.map((e, index) => {
                         return <MapView.Marker ref={`mapViewMarker${index}`} key={`coordinate_${index}`}
                                                centerOffset={{x: 5, y: -21}}
-                                               title={coordinate.title}
-                                               coordinate={coordinate} onPress={() => this.bounce(index)}>
+                            // title={e.name}
+                                               coordinate={{latitude: e.location[0], longitude: e.location[1]}}
+                                               onPress={() => this.bounce(index)}>
                             <Animatable.View ref={ref => this[`mapMarker_${index}`] = ref}>
-                                <MapMarker source={require('../../assets/images/durian.jpg')}
-                                           isCompleted={coordinate.completed}/>
+                                <MapMarker source={{uri: e.completed ? e.completed_image_url : e.image_url}}
+                                           isCompleted={e.completed}/>
                             </Animatable.View>
                         </MapView.Marker>
                     }
@@ -116,11 +108,11 @@ export class ChallengeMap extends React.Component {
     }
 
     render() {
-        const {challenges} = this.state
+        const {events} = this.state
         return (
             <SafeAreaView style={{flex: 1, justifyContent: 'space-between', alignItems: 'center',}}>
                 {this.renderMapsView()}
-                {this.renderPreviewModal(challenges)}
+                {this.renderPreviewModal(events)}
             </SafeAreaView>
         )
     }
@@ -129,25 +121,30 @@ export class ChallengeMap extends React.Component {
         this.setState({isModalVisible: false})
     }
 
-    RenderModalContent(challenge) {
+    RenderModalContent(event) {
         {
-            return challenge.completed ? this.renderCompletedModal(challenge) : this.renderChallengeModal(challenge)
+            //   change this user_completed true false
+            return event.completed ? this.renderCompletedModal() : this.renderChallengeModal(event)
+            // return this.renderChallengeModal(event)
         }
     }
 
-    renderPreviewModal(challenges) {
+    renderPreviewModal(events) {
+        if (events.length < 1) {
+            return null
+        }
         return (
             <Modal animationIn={'bounceIn'} animationOut={'bounceOut'} isVisible={this.state.isModalVisible}
                    onBackdropPress={this.closeModal}>
                 <View style={{borderRadius: 15, flex: 0.6, backgroundColor: "white"}}>
                     <DefaultCancelButton navigation={null} onPress={this.closeModal}/>
-                    {this.RenderModalContent(challenges[this.state.selectedChallengeIndex])}
+                    {this.RenderModalContent(events[this.state.selectedChallengeIndex])}
                 </View>
             </Modal>
         )
     }
 
-    renderCompletedModal(challenge) {
+    renderCompletedModal() {
         return (
             <ContainerWithoutSafeAreaView>
                 <Grid>
@@ -167,13 +164,13 @@ export class ChallengeMap extends React.Component {
         )
     }
 
-    renderChallengeModal(challenge) {
+    renderChallengeModal(event) {
         return (
             <React.Fragment>
                 <Grid>
                     <Row size={45}>
                         <View style={styles.Main}>
-                            <Image style={styles.modalImage} source={require('./../../assets/images/durian.jpg')}/>
+                            <Image style={styles.modalImage} source={{uri: event.image_url}}/>
                         </View>
                     </Row>
                     <Row size={55}>
@@ -182,16 +179,15 @@ export class ChallengeMap extends React.Component {
                                 <Col>
                                     <View style={{flex: 1, justifyContent: 'space-around'}}>
                                         <Text style={FontStyles.h1}>Here's your event</Text>
-                                        <Text style={FontStyles.regular}>Restaurant ABC</Text>
-                                        <Text style={FontStyles.small}>Find out how to win a 20% discount off your next
-                                            CirclesLife bill.</Text>
+                                        <Text style={FontStyles.regular}>{event.name}</Text>
+                                        <Text style={FontStyles.small}>{event.description}</Text>
                                     </View>
                                 </Col>
                             </Row>
                             <Row size={40}>
                                 <Col>
                                     <ButtonV1 title={'Try this challenge'}
-                                              onPress={() => this.onTryChallengePressed(challenge)}/>
+                                              onPress={() => this.onTryChallengePressed(event)}/>
                                 </Col>
                             </Row>
                         </ContainerWithoutSafeAreaView>
@@ -201,17 +197,37 @@ export class ChallengeMap extends React.Component {
         )
     }
 
-    onTryChallengePressed(challenge) {
+    onTryChallengePressed(event) {
         this.setState({
             isModalVisible: false,
         }, () => {
             setTimeout(() => {
                 return this.props.navigation.navigate('EventDetails', {
-                    challenge
+                    event
                 })
             }, 200)
         })
 
+    }
+
+    async fetchEvents() {
+        // look at this
+        // await this.props.screenProps.store.get(`events?campaign_id=1`).then(res => {
+        //     this.setState({
+        //         events: res
+        //     })
+        //     console.log(res, "ampaigns")
+        // })
+        //
+        // //
+        await fetch("http://172.20.10.3:5000/events?campaign_id=1&user_id=1").then(res => {
+            res.json().then(data => {
+                this.setState({
+                    events: data.response
+                })
+                console.log(data, 'campaigns')
+            })
+        })
     }
 }
 

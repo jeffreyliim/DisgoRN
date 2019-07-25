@@ -44,7 +44,8 @@ export class SelectChallenge extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            slider1ActiveSlide: 1
+            slider1ActiveSlide: 1,
+            campaigns: null
         };
         props.navigation.setParams({
             onMileStonesPressed: this.onMileStonesPressed
@@ -57,8 +58,17 @@ export class SelectChallenge extends React.Component {
 
     componentDidMount() {
 
+        this.fetchCampaigns()
         // Additional component initialization can go here.
         // If you need to load data from a remote endpoint, this is a good place to instantiate the network request.
+    }
+
+    async fetchCampaigns() {
+        await this.props.screenProps.store.get('campaigns').then(res => {
+            this.setState({
+                campaigns: res
+            })
+        })
     }
 
     // dispatching an action based on state change
@@ -77,19 +87,9 @@ export class SelectChallenge extends React.Component {
         //  }
     }
 
-    _renderItemWithParallax({item, index}, parallaxProps) {
-        return (
-            <SliderEntry
-                navigation={this.props.navigation}
-                data={item}
-                even={(index + 1) % 2 === 0}
-                parallax={true}
-                parallaxProps={parallaxProps}
-            />
-        );
-    }
-
     render() {
+        const {campaigns} = this.state
+
         return (
             <Grid>
                 <Row size={15}>
@@ -102,11 +102,13 @@ export class SelectChallenge extends React.Component {
                 </Row>
                 <Row size={45}>
                     <View style={{flex: 1}}>
-                        <ImageCarousel navigation={this.props.navigation} onSliderEntryPressed={() => {
-                            return this.props.navigation.navigate('ChallengeMap'
-                            // ,{campaignID}
-                                )
-                        }}/>
+                        <ImageCarousel campaigns={campaigns} navigation={this.props.navigation}
+                                       onSliderEntryPressed={(campaign) => {
+                                           console.log(campaign)
+                                           return this.props.navigation.navigate('ChallengeMap', {
+                                               campaign
+                                           })
+                                       }}/>
                     </View>
                 </Row>
                 <Row size={40}>

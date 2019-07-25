@@ -1,5 +1,5 @@
 import React from "react"
-import {Dimensions, StatusBar, StyleSheet} from "react-native"
+import {Dimensions, Platform, StatusBar, StyleSheet} from "react-native"
 import {FontStyles} from "../../styles/fontStyles";
 import {DefaultContainer} from "../../assets/components/containers/defaultContainer";
 import {moderateScale} from "react-native-size-matters";
@@ -30,7 +30,11 @@ export class ImageProcessing extends React.Component {
         this.state = {
             showSuccessAlert: false,
             showFailAlert: false,
-            imageResponse: props.navigation.getParam('imageResponse')
+            imageResponse: props.navigation.getParam('imageResponse'),
+            event: props.navigation.getParam('event'),
+            currentLatitude: props.navigation.getParam('currentLatitude'),
+            currentLongitude: props.navigation.getParam('currentLongitude'),
+            uploadResponse: {}
         }
     }
 
@@ -38,9 +42,6 @@ export class ImageProcessing extends React.Component {
     componentDidMount() {
         this.handleUploadPhoto()
         // console.log(this.state.imageResponse)
-        setTimeout(() => {
-            this.setState({showFailAlert: true,})
-        }, 3000)
         // console.log(this.state.imageResponse)
         // Additional component initialization can go here.
         // If you need to load data from a remote endpoint, this is a good place to instantiate the network request.
@@ -73,55 +74,68 @@ export class ImageProcessing extends React.Component {
 
     createFormData = (photo, body) => {
         const data = new FormData();
-        data.append('photo', {
-            uri: photo.uri,
+
+        data.append('file', {
+            uri: Platform.OS === "android" ? photo.uri : photo.uri.replace("file://", ""),
             name: `${photo.fileSize}_${Math.random().toString(10)}.jpeg`,
             type: photo.type,
+        });
+
+        Object.keys(body).forEach(key => {
+            data.append(key, body[key]);
         });
 
         return data;
     };
 
-    handleUploadPhoto = async () => {
-        await fetch(`${API_URL}/uploader`, {
+    handleUploadPhoto = () => {
+        fetch(`${API_URL}submit_image`, {
             method: "POST",
-            body: this.createFormData(this.state.imageResponse, null)
+            body: this.createFormData(this.state.imageResponse, {
+                event_id: this.state.event.event_id,
+                user_id: 1,
+                campaign_id: this.state.event.campaign_id,
+                latitude: this.state.currentLatitude,
+                longtitude: this.state.currentLongitude
+            }),
         }).then(response => {
-            alert("Upload success!");
             response.json().then(data => {
                 console.log(data)
-                this.setState({imageResponse: null});
+                this.setState({
+                    uploadResponse: data
+                })
+                if (data.status === 0) {
+                    return this.handleUploadPhotoFailedResponse()
+                }
+                if (data.response.success === false) {
+                    return this.handleUploadPhotoFailedResponse()
+                }
+                this.handleUploadPhotoSuccessResponse()
             })
         }).catch(error => {
             console.log("upload error", error);
-            alert("Upload failed!");
+            this.handleUploadPhotoFailedResponse()
         });
     }
 
     handleUploadPhotoFailedResponse() {
         this.setState({
             showFailAlert: true,
-        }, () => {
-            // delete image
-            RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
         })
     }
 
     handleUploadPhotoSuccessResponse() {
         this.setState({
             showSuccessAlert: true,
-        }, () => {
-            // delete image
-            RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
         })
     }
 
-    renderImageComparison() {
+    renderImageComparison(event) {
         return (
             <View style={{flex: 1}}>
                 <Row style={styles.lottie}>
                     <Col style={{paddingRight: 20}}>
-                        <ImageBox source={require('./../../assets/images/durian.jpg')}/>
+                        <ImageBox source={{uri: event.image_url}}/>
                     </Col>
                     <Col>
                         <ImageBox source={{uri: this.state.imageResponse.uri}}/>
@@ -132,7 +146,7 @@ export class ImageProcessing extends React.Component {
     }
 
     render() {
-        const {showSuccessAlert, showFailAlert, imageResponse} = this.state
+        const {showSuccessAlert, showFailAlert, imageResponse, event, uploadResponse} = this.state
 
         return (
             <DefaultContainer backgroundColor={'#0099FF'}>
@@ -146,7 +160,7 @@ export class ImageProcessing extends React.Component {
                                                             source={require('./../../assets/animations/4022-success-animation.json')}
                                                             autoPlay={true}
                                                             loop={false}/>
-                                : showFailAlert ? this.renderImageComparison() :
+                                : showFailAlert ? this.renderImageComparison(event) :
                                     <LottieView style={styles.lottie}
                                                 source={require('./../../assets/animations/7655-rocket.json')}
                                                 autoPlay={true}
@@ -162,7 +176,7 @@ export class ImageProcessing extends React.Component {
                                 color: 'white'
                             }]}>
                                 {showSuccessAlert ? 'Yay, your image has passed' :
-                                    showFailAlert ? `Oh no, it seems like the image you've sent is not good enough` : 'Please be patient while we process your image... Do not close the app'}</Text>
+                                    showFailAlert ? uploadResponse.response.message : 'Please be patient while we process your image... Do not close the app'}</Text>
                         </Col>
                     </Row>
                     <Row size={30}>
@@ -183,16 +197,18 @@ export class ImageProcessing extends React.Component {
         RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
 
         // temporary here only, pls remove when integrating
-        this.setState({
-            showSuccessAlert: true
-        })
-        // return this.props.navigation.navigate('EventDetails')
+        // this.setState({
+        //     imageResponse: null
+        // })
+        return this.props.navigation.navigate('EventDetails')
     }
 
     onSeeYourResults() {
+        RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
         this.setState({
             showSuccessAlert: false,
             showFailAlert: false,
+            imageResponse: null
         })
         return this.props.navigation.navigate('EventResults')
     }
