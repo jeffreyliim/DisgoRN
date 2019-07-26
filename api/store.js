@@ -19,57 +19,20 @@ export class Store {
         })
     }
 
-    async delete(URL, body) {
-        const appURL = API_URL + URL
-        const fetchURL = URL.includes('https') && URL || appURL
-        return new Promise(async (resolve, reject) => {
-            return await fetch(appURL, {
-                method: 'delete',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Accept': 'application/json',
-                    // 'Authorization': 'Bearer ' + await AsyncStorage.getItem('access_token'),
-                },
-                body: JSON.stringify(body)
-            }).then(async r => {
-                resolve(await formatResult(r));
-            })
-        })
-
-    }
-
     async post(URL, body) {
         const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
-            await fetch(appURL, {
+            await fetch(fetchURL, {
                 method: 'post',
                 headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Accept': 'application/json',
+                    // 'Content-Type': 'application/json; charset=utf-8',
+                    // 'Accept': 'application/json',
                     // 'Authorization': 'Bearer ' + await AsyncStorage.getItem('access_token'),
                 },
-                body: JSON.stringify(body)
+                body,
             }).then(async r => {
                 return resolve(await formatResult(r))
-            })
-        })
-    }
-
-    async put(URL, body) {
-        const appURL = API_URL + URL
-        const fetchURL = URL.includes('https') && URL || appURL
-        return new Promise(async (resolve, reject) => {
-            await fetch(appURL, {
-                method: 'put',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Accept': 'application/json',
-                    // 'Authorization': 'Bearer ' + await AsyncStorage.getItem('access_token'),
-                },
-                body: JSON.stringify(body)
-            }).then(async r => {
-                resolve(await formatResult(r));
             })
         })
     }

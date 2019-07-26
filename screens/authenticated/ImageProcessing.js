@@ -11,7 +11,6 @@ import {Col, Row} from "react-native-easy-grid";
 import {ButtonV2} from "../../assets/components/buttons/buttonV2";
 import Animatable from './../../assets/animations/customAnimations'
 import RNFS from "react-native-fs";
-import {API_URL} from "../../config/config";
 
 const {fontScale, height, width} = Dimensions.get('window')
 
@@ -40,7 +39,9 @@ export class ImageProcessing extends React.Component {
 
 
     componentDidMount() {
-        this.handleUploadPhoto()
+        setTimeout(() => {
+            this.handleUploadPhoto()
+        }, 3000)
         // console.log(this.state.imageResponse)
         // console.log(this.state.imageResponse)
         // Additional component initialization can go here.
@@ -88,34 +89,29 @@ export class ImageProcessing extends React.Component {
         return data;
     };
 
-    handleUploadPhoto = () => {
-        fetch(`${API_URL}submit_image`, {
-            method: "POST",
-            body: this.createFormData(this.state.imageResponse, {
-                event_id: this.state.event.event_id,
-                user_id: 1,
-                campaign_id: this.state.event.campaign_id,
-                latitude: this.state.currentLatitude,
-                longtitude: this.state.currentLongitude
-            }),
-        }).then(response => {
-            response.json().then(data => {
-                console.log(data)
-                this.setState({
-                    uploadResponse: data
-                })
-                if (data.status === 0) {
-                    return this.handleUploadPhotoFailedResponse()
-                }
-                if (data.response.success === false) {
-                    return this.handleUploadPhotoFailedResponse()
-                }
-                this.handleUploadPhotoSuccessResponse()
+    handleUploadPhoto = async () => {
+
+        let body = this.createFormData(this.state.imageResponse, {
+            event_id: this.state.event.event_id,
+            user_id: 1,
+            campaign_id: this.state.event.campaign_id,
+            latitude: this.state.currentLatitude,
+            longtitude: this.state.currentLongitude
+        })
+
+        await this.props.screenProps.store.post('submit_image', body).then(data => {
+            console.log(data)
+            this.setState({
+                uploadResponse: data
             })
-        }).catch(error => {
-            console.log("upload error", error);
-            this.handleUploadPhotoFailedResponse()
-        });
+            if (data.status === 0) {
+                return this.handleUploadPhotoFailedResponse()
+            }
+            if (data.response.success === false) {
+                return this.handleUploadPhotoFailedResponse()
+            }
+            this.handleUploadPhotoSuccessResponse()
+        })
     }
 
     handleUploadPhotoFailedResponse() {
