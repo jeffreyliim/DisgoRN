@@ -57,7 +57,9 @@ export class ImageCarousel extends React.Component {
         return (
             <SliderEntry
                 navigation={this.props.navigation}
-                onSliderEntryPressed={() => this.props.onSliderEntryPressed(item)}
+                onSliderEntryPressed={() =>{
+                    this.props.onSliderEntryPressed(item)
+                }}
                 data={item}
                 even={(index + 1) % 2 === 0}
                 parallax={true}
@@ -89,7 +91,9 @@ export class ImageCarousel extends React.Component {
                     autoplay={true}
                     autoplayDelay={500}
                     autoplayInterval={3000}
-                    onSnapToItem={(index) => this.setState({slider1ActiveSlide: index})}
+                    onSnapToItem={(index) => {
+                        this.setState({slider1ActiveSlide: index})
+                    }}
                 />
                 <Pagination
                     dotsLength={campaigns ? campaigns.length : ENTRIES1.length}
@@ -112,7 +116,7 @@ export class ImageCarousel extends React.Component {
             let formattedCampaigns = []
             campaigns.response.map(c => {
                 let obj = {
-                    id: c.id,
+                    id: c.campaign_id,
                     title: c.name,
                     subtitle: c.description,
                     illustration: c.image_url

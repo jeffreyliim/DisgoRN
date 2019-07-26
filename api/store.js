@@ -2,7 +2,7 @@ import {formatResult} from "../util/helpers";
 import {API_URL} from "../config/config";
 
 export class Store {
-    async get(URL, body) {
+    async get(URL) {
         const appURL = API_URL + URL
         const fetchURL = URL.includes('https') && URL || appURL
         return new Promise(async (resolve, reject) => {
@@ -13,7 +13,6 @@ export class Store {
                     'Accept': 'application/json',
                     // 'Authorization': 'Bearer ' + await AsyncStorage.getItem('access_token'),
                 },
-                body: JSON.stringify(body)
             }).then(async r => {
                 resolve(await formatResult(r))
             })

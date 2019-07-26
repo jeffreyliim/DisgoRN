@@ -212,21 +212,11 @@ export class ChallengeMap extends React.Component {
 
     async fetchEvents() {
         // look at this
-        // await this.props.screenProps.store.get(`events?campaign_id=1`).then(res => {
-        //     this.setState({
-        //         events: res
-        //     })
-        //     console.log(res, "ampaigns")
-        // })
-        //
-        // //
-        await fetch("http://172.20.10.3:5000/events?campaign_id=1&user_id=1").then(res => {
-            res.json().then(data => {
-                this.setState({
-                    events: data.response
-                })
-                console.log(data, 'campaigns')
+        await this.props.screenProps.store.get(`events?campaign_id=${this.state.campaign.id}&user_id=1`).then(data => {
+            this.setState({
+                events: data.response
             })
+            console.log(data, "campaigns")
         })
     }
 }

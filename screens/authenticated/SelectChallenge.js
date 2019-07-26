@@ -64,7 +64,7 @@ export class SelectChallenge extends React.Component {
     }
 
     async fetchCampaigns() {
-        await this.props.screenProps.store.get('campaigns').then(res => {
+        await this.props.screenProps.store.get('campaigns?user_id=1').then(res => {
             this.setState({
                 campaigns: res
             })
@@ -89,7 +89,6 @@ export class SelectChallenge extends React.Component {
 
     render() {
         const {campaigns} = this.state
-
         return (
             <Grid>
                 <Row size={15}>
