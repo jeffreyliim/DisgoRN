@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
-	<string></string>
+	<string/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -39,6 +39,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>We need permissions for your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We will need your location to verify the authenticity of picture taken</string>
 	<key>UIAppFonts</key>
