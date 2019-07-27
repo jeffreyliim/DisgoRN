@@ -105,7 +105,7 @@ export class SelectChallenge extends React.Component {
                                        onSliderEntryPressed={(campaign) => {
                                            console.log(campaign)
                                            return this.props.navigation.navigate('ChallengeMap', {
-                                               campaign
+                                               campaign_id: campaign.id
                                            })
                                        }}/>
                     </View>

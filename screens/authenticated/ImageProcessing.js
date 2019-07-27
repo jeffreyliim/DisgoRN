@@ -33,7 +33,8 @@ export class ImageProcessing extends React.Component {
             event: props.navigation.getParam('event'),
             currentLatitude: props.navigation.getParam('currentLatitude'),
             currentLongitude: props.navigation.getParam('currentLongitude'),
-            uploadResponse: {}
+            uploadResponse: {},
+            redirectCampaignId: null
         }
     }
 
@@ -57,6 +58,7 @@ export class ImageProcessing extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         // only update chart if the data has changed
+        //  if success
         if (prevState.showSuccessAlert !== this.state.showSuccessAlert && this.state.showSuccessAlert === true) {
             this.setState({
                 showSuccessAlert: this.state.showSuccessAlert,
@@ -64,6 +66,8 @@ export class ImageProcessing extends React.Component {
             })
             this.view.fadeInUp()
         }
+
+        // if fail
         if (prevState.showFailAlert !== this.state.showFailAlert && this.state.showFailAlert === true) {
             this.setState({
                 showFailAlert: this.state.showFailAlert,
@@ -110,7 +114,7 @@ export class ImageProcessing extends React.Component {
             if (data.response.success === false) {
                 return this.handleUploadPhotoFailedResponse()
             }
-            this.handleUploadPhotoSuccessResponse()
+            this.handleUploadPhotoSuccessResponse(data.campaign_id)
         })
     }
 
@@ -120,9 +124,10 @@ export class ImageProcessing extends React.Component {
         })
     }
 
-    handleUploadPhotoSuccessResponse() {
+    handleUploadPhotoSuccessResponse(campaign_id) {
         this.setState({
             showSuccessAlert: true,
+            redirectCampaignId: campaign_id
         })
     }
 
@@ -142,13 +147,12 @@ export class ImageProcessing extends React.Component {
     }
 
     render() {
-        const {showSuccessAlert, showFailAlert, imageResponse, event, uploadResponse} = this.state
+        const {showSuccessAlert, showFailAlert, event, uploadResponse} = this.state
 
         return (
             <DefaultContainer backgroundColor={'#0099FF'}>
                 <StatusBar barStyle={'light-content'}/>
-                <Animatable.View ref={ref => this.view = ref} delay={500} duration={1500}
-                                 style={{flex: 1}}>
+                <Animatable.View ref={ref => this.view = ref} delay={200} duration={1000} style={{flex: 1}}>
                     <Row size={20}/>
                     <Row size={30}>
                         <Col style={styles.Main}>
@@ -181,7 +185,7 @@ export class ImageProcessing extends React.Component {
                                 <ButtonV2 title={'Try again'} onPress={this.onTryAgainPressed}/>
                             </Col>
                             : showSuccessAlert ? <Col style={[styles.Main, {alignItems: 'stretch'}]}>
-                                <ButtonV2 title={'See your results'} onPress={this.onSeeYourResults}/>
+                                <ButtonV2 title={'Done'} onPress={this.onDonePressed}/>
                             </Col> : null}
                     </Row>
                 </Animatable.View>
@@ -191,22 +195,20 @@ export class ImageProcessing extends React.Component {
 
     onTryAgainPressed() {
         RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
-
-        // temporary here only, pls remove when integrating
-        // this.setState({
-        //     imageResponse: null
-        // })
         return this.props.navigation.navigate('EventDetails')
     }
 
-    onSeeYourResults() {
+    onDonePressed() {
         RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
         this.setState({
             showSuccessAlert: false,
             showFailAlert: false,
             imageResponse: null
         })
-        return this.props.navigation.navigate('EventResults')
+        return this.props.navigation.navigate('ChallengeMap', {
+            campaign_id: this.state.redirectCampaignId,
+            reloadCallBack:this.handleUploadPhoto()
+        })
     }
 }
 

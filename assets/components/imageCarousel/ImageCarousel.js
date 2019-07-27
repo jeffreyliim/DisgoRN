@@ -23,13 +23,15 @@ export const ENTRIES1 = [
         id: 1,
         title: '',
         subtitle: '',
-        illustration: 'https://i.ibb.co/84b1XHQ/sg-food.jpg'
+        illustration: 'https://i.ibb.co/84b1XHQ/sg-food.jpg',
+        percentage_completed: 0
     },
     {
         id: 2,
         title: '',
         subtitle: '',
-        illustration: 'https://i.ibb.co/B3jRryC/merlion.jpg",'
+        illustration: 'https://i.ibb.co/B3jRryC/merlion.jpg',
+        percentage_completed: 0
     },
 ];
 
@@ -57,7 +59,7 @@ export class ImageCarousel extends React.Component {
         return (
             <SliderEntry
                 navigation={this.props.navigation}
-                onSliderEntryPressed={() =>{
+                onSliderEntryPressed={() => {
                     this.props.onSliderEntryPressed(item)
                 }}
                 data={item}
@@ -119,7 +121,8 @@ export class ImageCarousel extends React.Component {
                     id: c.campaign_id,
                     title: c.name,
                     subtitle: c.description,
-                    illustration: c.image_url
+                    illustration: c.image_url,
+                    percentage_completed: c.percentage,
                 }
                 formattedCampaigns.push(obj)
             })

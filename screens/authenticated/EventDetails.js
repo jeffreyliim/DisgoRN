@@ -130,8 +130,9 @@ export class EventDetails extends React.Component {
 
     render() {
         const {event} = this.state
+        console.log(event)
         return (
-            <Animatable.View style={{flex: 1}} animation={"fadeIn"} duration={2700} ref={ref => this.view = ref}>
+            <Animatable.View style={{flex: 1}} animation={"fadeIn"} delay={200} ref={ref => this.view = ref}>
                 <DefaultContainer>
                     <Grid>
                         <Row size={3}/>

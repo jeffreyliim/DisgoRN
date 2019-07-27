@@ -36,7 +36,7 @@ export class ChallengeMap extends React.Component {
         super(props);
         this.state = {
             isModalVisible: false,
-            campaign: props.navigation.getParam('campaign'),
+            campaign_id: props.navigation.getParam('campaign_id'),
             events: [],
             selectedChallengeIndex: 0,
         }
@@ -89,6 +89,7 @@ export class ChallengeMap extends React.Component {
                 longitudeDelta: LONGITUDE_DELTA,
             }}
                      showsPointsOfInterest={true}
+                     showsUserLocation={true}
                      style={StyleSheet.absoluteFill}>
                 {events.map((e, index) => {
                         return <MapView.Marker ref={`mapViewMarker${index}`} key={`coordinate_${index}`}
@@ -124,7 +125,7 @@ export class ChallengeMap extends React.Component {
     RenderModalContent(event) {
         {
             //   change this user_completed true false
-            return event.completed ? this.renderCompletedModal() : this.renderChallengeModal(event)
+            return event.completed ? this.renderCompletedModal(event) : this.renderChallengeModal(event)
             // return this.renderChallengeModal(event)
         }
     }
@@ -144,17 +145,20 @@ export class ChallengeMap extends React.Component {
         )
     }
 
-    renderCompletedModal() {
+    renderCompletedModal(event) {
         return (
             <ContainerWithoutSafeAreaView>
                 <Grid>
-                    <Row size={10}>
+                    <Row size={45}>
+                        <View style={styles.Main}>
+                            <Image style={styles.modalImage} source={{uri: event.completed_image_url}}/>
+                        </View>
                     </Row>
-                    <Row size={55}>
+                    <Row size={30}>
                         <LottieView source={require('./../../assets/animations/1798-check-animation.json')} autoPlay
                                     loop={false}/>
                     </Row>
-                    <Row size={35}>
+                    <Row size={25}>
                         <Text style={[FontStyles.h1, {textAlign: 'center', marginLeft: 20, marginRight: 20}]}>You've
                             already completed this
                             event</Text>
@@ -212,7 +216,7 @@ export class ChallengeMap extends React.Component {
 
     async fetchEvents() {
         // look at this
-        await this.props.screenProps.store.get(`events?campaign_id=${this.state.campaign.id}&user_id=1`).then(data => {
+        await this.props.screenProps.store.get(`events?campaign_id=${this.state.campaign_id}&user_id=1`).then(data => {
             this.setState({
                 events: data.response
             })

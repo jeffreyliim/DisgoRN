@@ -4,6 +4,7 @@ import {ParallaxImage} from "react-native-snap-carousel";
 import {Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {colors} from "../../../styles/colors";
 import {autobind} from "core-decorators";
+import {Badge} from "react-native-elements";
 
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
 const entryBorderRadius = 8;
@@ -56,17 +57,14 @@ export class SliderEntry extends Component {
     }
 
     render() {
-        const {data: {id, title, subtitle}, even} = this.props;
-
+        const {data: {id, title, subtitle, percentage_completed}, even} = this.props;
         const uppercaseTitle = title ? (
             <Text
                 style={[styles.title, even ? styles.titleEven : {}]}
-                numberOfLines={2}
-            >
+                numberOfLines={2}>
                 {title.toUpperCase()}
             </Text>
         ) : false;
-
         return (
             <TouchableOpacity
                 activeOpacity={1}
@@ -81,9 +79,11 @@ export class SliderEntry extends Component {
                     <View style={[styles.textContainer, even ? styles.textContainerEven : {}]}>
                         {uppercaseTitle}
                         <Text
-                            style={[styles.subtitle, even ? styles.subtitleEven : {}]}
-                            numberOfLines={2}
-                        >
+                            style={[styles.title, even ? styles.titleEven : {}]}
+                            numberOfLines={2}>
+                            {Math.round(percentage_completed)}% completed
+                        </Text>
+                        <Text style={[styles.subtitle, even ? styles.subtitleEven : {}]} numberOfLines={2}>
                             {subtitle}
                         </Text>
                     </View>
