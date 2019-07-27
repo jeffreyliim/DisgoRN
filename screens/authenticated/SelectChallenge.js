@@ -94,7 +94,7 @@ export class SelectChallenge extends React.Component {
                 <Row size={15}>
                     <DefaultContainer>
                         <View style={styles.Main}>
-                            <Text style={FontStyles.h1}>Discover Challenges</Text>
+                            <Text style={FontStyles.h1}>Discover with Dora</Text>
                             <Text style={FontStyles.small}>We have a range of them around Singapore!</Text>
                         </View>
                     </DefaultContainer>

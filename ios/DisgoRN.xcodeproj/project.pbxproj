@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		0042D5F222E2EC0D007EF60B /* Lottie.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0042D5E322E2EBEA007EF60B /* Lottie.framework */; };
 		0042D5F322E2EC0D007EF60B /* Lottie.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0042D5E322E2EBEA007EF60B /* Lottie.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };

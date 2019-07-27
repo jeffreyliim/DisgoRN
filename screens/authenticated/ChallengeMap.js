@@ -207,7 +207,9 @@ export class ChallengeMap extends React.Component {
         }, () => {
             setTimeout(() => {
                 return this.props.navigation.navigate('EventDetails', {
-                    event
+                    event,
+                    // call back to refire the the fetch events
+                    onReloadCampaigns: () => this.fetchEvents()
                 })
             }, 200)
         })

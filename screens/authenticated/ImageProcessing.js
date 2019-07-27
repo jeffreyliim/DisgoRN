@@ -199,16 +199,19 @@ export class ImageProcessing extends React.Component {
     }
 
     onDonePressed() {
-        RNFS.unlink(this.state.imageResponse.uri); // Remove image from cache
-        this.setState({
-            showSuccessAlert: false,
-            showFailAlert: false,
-            imageResponse: null
-        })
-        return this.props.navigation.navigate('ChallengeMap', {
-            campaign_id: this.state.redirectCampaignId,
-            reloadCallBack:this.handleUploadPhoto()
-        })
+        RNFS.unlink(this.state.imageResponse.uri).then(res => {
+            // Remove image from cache
+            this.setState({
+                showSuccessAlert: false,
+                showFailAlert: false,
+            })
+            //  fire the
+            this.props.navigation.state.params.onReloadCampaigns();
+            return this.props.navigation.navigate('ChallengeMap', {
+                campaign_id: this.state.redirectCampaignId,
+            })
+        });
+
     }
 }
 

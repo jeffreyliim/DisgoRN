@@ -13,5 +13,5 @@ export function formatResult(result) {
 }
 
 export function dateFormat() {
-    return 'YYYY-MM-DD H:mm:ss'
+    return 'Do MMMM YYYY'
 }

@@ -87,6 +87,8 @@ export class EventDetails extends React.Component {
                     event: this.state.event,
                     currentLatitude: this.state.currentLatitude,
                     currentLongitude: this.state.currentLongitude,
+                    //  call back to google maps
+                    onReloadCampaigns: () => this.props.navigation.state.params.onReloadCampaigns()
                 })
             }
         });
