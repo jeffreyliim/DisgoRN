@@ -1,5 +1,5 @@
 import React from "react"
-import {Dimensions, StyleSheet} from "react-native"
+import {Dimensions, FlatList, StyleSheet} from "react-native"
 import {NavbarStyles} from "../../styles/navbarStyles";
 import {DefaultContainer} from "../../assets/components/containers/defaultContainer";
 import {DefaultBackButton} from "../../assets/components/buttons/defaultBackButton";
@@ -95,12 +95,14 @@ export class Milestones extends React.Component {
                         color: 'white',
                         padding: 6,
                     }}
+                    options={{enableEmptySections: true}}
                     descriptionStyle={{color: 'gray'}}
                     innerCircle={'icon'}
                     iconStyle={{marginTop: 30}}
                     renderDetail={this.renderDetail}
                     renderFullLine={true}
                     detailContainerStyle={{marginTop: -5}}
+                    enableEmptySections={false}
                 />
             </DefaultContainer>
         )
@@ -149,51 +151,60 @@ export class Milestones extends React.Component {
                 flexDirection: 'row',
                 justifyContent: 'flex-start'
             }}>
-                {this.state.campaigns.length > 0 && this.state.campaigns.map(data => {
-                    return <View style={{height: 60, width: 85, justifyContent: 'center', alignItems: 'center'}}>
-                        <View style={{
-                            shadowOffset: {width: 0, height: 8},
-                            shadowRadius: 10, shadowOpacity: 0.25, borderRadius: 25, elevation: 5,
-                        }}>
-                            <Tooltip key={data.campaign_id} popover={<Text
-                                style={[FontStyles.smallBold, {color: colors.white}]}>{data.name}</Text>}>
-                                <View>
-                                    <Image style={{
-                                        height: 60, width: 60,
-                                    }}
-                                           source={{uri: `https://hackathon-circles.s3-ap-southeast-1.amazonaws.com/badge_image_url/badge${data.campaign_id}.png`}}/>
-                                    <View style={[{
-                                        backgroundColor: colors.black,
-                                        position: 'absolute',
-                                        zIndex: 100,
-                                        height: 60,
-                                        width: 60,
-                                        borderRadius: 30,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }, data.percentage === 100 ? {opacity: 0} : {opacity: 1 - ((data.percentage / 100))}]}>
-                                    </View>
-                                    <View style={{
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        width: '100%',
-                                        height: '100%',
-                                        position: 'absolute',
-                                        zIndex: 1000
-                                    }}>
-                                        {data.percentage !== 100 &&
-                                        <Text
-                                            style={[FontStyles.smallBold, {
-                                                color: colors.white,
-                                                position: 'absolute'
-                                            }]}>{data.percentage}%</Text>
-                                        }
-                                    </View>
-                                </View>
-                            </Tooltip>
+                {this.state.campaigns.length > 0 &&
+                <FlatList keyExtractor={(item, index) => index.toString()}
+                          extraData={this.state}
+                          renderItem={this.renderBadgesItem} horizontal={true}
+                          data={this.state.campaigns}/>}
+            </View>
+        )
+    }
+
+    renderBadgesItem({item, index}) {
+        return (
+            <View
+                style={{height: 110, width: 85, justifyContent: 'center', alignItems: 'center',}}>
+                <View style={{
+                    shadowOffset: {width: 0, height: 8},
+                    shadowRadius: 10, shadowOpacity: 0.25, borderRadius: 25, elevation: 5,
+                }}>
+                    <Tooltip popover={<Text
+                        style={[FontStyles.smallBold, {color: colors.white}]}>{item.name}</Text>}>
+                        <View>
+                            <Image style={{
+                                height: 60, width: 60,
+                            }}
+                                   source={{uri: `https://hackathon-circles.s3-ap-southeast-1.amazonaws.com/badge_image_url/badge${item.campaign_id}.png`}}/>
+                            <View style={[{
+                                backgroundColor: colors.black,
+                                position: 'absolute',
+                                zIndex: 100,
+                                height: 60,
+                                width: 60,
+                                borderRadius: 30,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }, item.percentage === 100 ? {opacity: 0} : {opacity: 1 - ((item.percentage / 100))}]}>
+                            </View>
+                            <View style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                zIndex: 1000
+                            }}>
+                                {item.percentage !== 100 &&
+                                <Text
+                                    style={[FontStyles.smallBold, {
+                                        color: colors.white,
+                                        position: 'absolute'
+                                    }]}>{item.percentage}%</Text>
+                                }
+                            </View>
                         </View>
-                    </View>
-                })}
+                    </Tooltip>
+                </View>
             </View>
         )
     }
